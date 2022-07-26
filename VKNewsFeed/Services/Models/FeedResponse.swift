@@ -13,7 +13,7 @@ struct FeedResponseWrapped: Decodable {
     let response: FeedResponse
 }
 
-//Один пост
+//Масив постів
 struct FeedResponse: Decodable {
     var items: [FeedItem]
 }

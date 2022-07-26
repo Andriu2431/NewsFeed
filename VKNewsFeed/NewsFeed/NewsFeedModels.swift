@@ -16,24 +16,39 @@ enum NewsFeed {
         //Iteractor
         struct Request {
             enum RequestType {
-                case some
-                case getFeed
+                case getNewsFeed
             }
         }
         //Presenter
         struct Response {
             enum ResponseType {
-                case some
-                case presentNewsFeed
+                case presentNewsFeed(feed: FeedResponse)
             }
         }
         //ViewController
         struct ViewModel {
             enum ViewModelData {
-                case some
-                case displayNewsFeed
+                case displayNewsFeed(feedViewModel: FeedViewModel)
             }
         }
     }
+}
+
+//Це пости
+struct FeedViewModel {
+    //Це один пост
+    struct Cell: FeedCellViewModel {
+        var iconUrlString: String
+        var name: String
+        var date: String
+        var text: String?
+        var likes: String?
+        var comments: String?
+        var shares: String?
+        var views: String?
+    }
+    
+    //З постів в нас буде масив
+    let cells: [Cell]
     
 }

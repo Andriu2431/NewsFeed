@@ -16,7 +16,11 @@ protocol NewsFeedBusinessLogic {
 class NewsFeedInteractor: NewsFeedBusinessLogic {
     
     var presenter: NewsFeedPresentationLogic?
+    //Worker
     var service: NewsFeedService?
+    
+    //Передаємо NetworkService через який зробили запит та оримаємо відповідь
+    private var fetcher: DataFetcherProtocol = NetworkDataFetcher(networking: NetworkService())
     
     func makeRequest(request: NewsFeed.Model.Request.RequestType) {
         if service == nil {
@@ -25,13 +29,15 @@ class NewsFeedInteractor: NewsFeedBusinessLogic {
         
         //Через switch будемо обробляти запит який передали сюди в метод
         switch request {
-        case .some:
-            print(".some Interactor")
-        case .getFeed:
-            print(".getFeed Interactor")
-            //Передаємо дані в presenter
-            presenter?.presentData(response: .presentNewsFeed)
+        case .getNewsFeed:
+            //Робимо запит та отримуємо пости
+            fetcher.getFeed { [weak self] feedResponse in
+                
+                guard let feedResponse = feedResponse else { return }
+                
+                //Передаємо пости в Presenter
+                self?.presenter?.presentData(response: .presentNewsFeed(feed: feedResponse))
+            }
         }
     }
-    
 }

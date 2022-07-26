@@ -19,6 +19,9 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic {
     var interactor: NewsFeedBusinessLogic?
     var router: (NSObjectProtocol & NewsFeedRoutingLogic)?
 
+    //Створюємо модель постів
+    private var feedViewModel = FeedViewModel.init(cells: [])
+    
     @IBOutlet weak var table: UITableView!
     
     // MARK: Setup
@@ -34,10 +37,7 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic {
         presenter.viewController  = viewController
         router.viewController     = viewController
     }
-    
-    // MARK: Routing
-    
-    
+
     
     // MARK: View lifecycle
     
@@ -47,39 +47,39 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic {
         
         //Рейструємо контейнер через xib файл
         table.register(UINib(nibName: "NewsFeedCell", bundle: nil), forCellReuseIdentifier: NewsFeedCell.reuseId)
+        
+        //Відправляємо запит до interactor для отримання даних якими заповнимо контейнери.
+        interactor?.makeRequest(request: .getNewsFeed)
     }
     
     //Метод приймає готові дані для відображення з моделі даних
     func displayData(viewModel: NewsFeed.Model.ViewModel.ViewModelData) {
         
         switch viewModel {
-        case .some:
-            print(".some ViewConrtoller")
-        case .displayNewsFeed:
-            print(".displayNewsFeed ViewConrtoller")
+        case .displayNewsFeed(feedViewModel: let feedViewModel):
+            //Заповнюємо модель постів тими поставми які отримуємо тут
+            self.feedViewModel = feedViewModel
+            table.reloadData()
         }
     }
-    
 }
+    
 
 //MARK: UITableViewDelegate, UITableViewDataSource
 
 extension NewsFeedViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return feedViewModel.cells.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: NewsFeedCell.reuseId, for: indexPath) as! NewsFeedCell
-        
+        //Пост з моделі витягуємо по індексу
+        let cellViewModel = feedViewModel.cells[indexPath.row]
+        //Беремо пост по індексу та передаємо в метод який буде заповнювати контейнер данними
+        cell.set(viewModel: cellViewModel)
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("select row")
-        //request - що ми хочемо щоб виконувалось при нажиманні на контейнер, ми будемо запитувати данні для показу стрічки новин
-        interactor?.makeRequest(request: .getFeed)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
