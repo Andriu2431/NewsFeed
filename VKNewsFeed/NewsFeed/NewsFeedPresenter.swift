@@ -22,34 +22,37 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
         dt.dateFormat = "d MMM 'в' HH:mm"
         return dt
     }
-
+    
     func presentData(response: NewsFeed.Model.Response.ResponseType) {
-
+        
         //Обробимо дані які передаємо в controller
         switch response {
         case .presentNewsFeed(feed: let feed):
-
+            
             //Беремо масив постів, проходимось по ньому
             let cells = feed.items.map { feedItem in
                 //Кожен пост приводимо до простих типві
                 cellViewModel(from: feedItem, profiles: feed.profiles, groups: feed.groups)
             }
-
+            
             //З масиву постів робимо дані для одного поста
             let feedViewModel = FeedViewModel(cells: cells)
             //Передаємо цей пост в ViewController
             viewController?.displayData(viewModel: .displayNewsFeed(feedViewModel: feedViewModel))
         }
     }
-
+    
     //Метод в якому будемо робити потрібні нам дані
     private func cellViewModel(from feedItem: FeedItem, profiles: [Profile], groups: [Group]) -> FeedViewModel.Cell {
-
+        
         let profile = self.profile(for: feedItem.sourceId, profiles: profiles, groups: groups)
+        
+        //Отримуємо фото поста
+        let photoAttachement = self.photoAttachement(feedItem: feedItem)
         
         let date = Date(timeIntervalSince1970: feedItem.date)
         let dateTitle = dateFormater.string(from: date)
-
+        
         //Тобто в модель поста передаємо отриманні данні але в простих типах. Тобто ми маємо данні FeedItem але там вони в своїх типах а нам потрібно їх привести до простих типів FeedViewModel.Cell.
         return FeedViewModel.Cell.init(iconUrlString: profile.photo,
                                        name: profile.name,
@@ -58,12 +61,13 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
                                        likes: String(feedItem.likes?.count ?? 0),
                                        comments: String(feedItem.comments?.count ?? 0),
                                        shares: String(feedItem.reposts?.count ?? 0),
-                                       views: String(feedItem.views?.count ?? 0))
+                                       views: String(feedItem.views?.count ?? 0),
+                                       photoAttachement: photoAttachement)
     }
-
+    
     //Метод який буде шукати інформацію для користувача
     private func profile(for sourseId: Int, profiles: [Profile], groups: [Group]) -> ProfileRepresentable {
-
+        
         //Якщо sourseId більше 0 то заповнюємо користувачами, якщо ні то групами
         let profilesOrGroups: [ProfileRepresentable] = sourseId >= 0 ? profiles : groups
         //Якщо більше 0 то присвоюємо sourseId якщо ні то міняємо знак
@@ -72,8 +76,22 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
         let profileRepresentable = profilesOrGroups.first { myProfileRepresentable -> Bool in
             myProfileRepresentable.id == normalSourseId
         }
-
+        
         return profileRepresentable!
+    }
+    
+    //Метод який дістає фото
+    private func photoAttachement(feedItem: FeedItem) -> FeedViewModel.FeedCellPhotoAttachement? {
+        
+        //Проходимось по attachments, якщо находимо фото то передаємо в масив photos
+        guard let photos = feedItem.attachments?.compactMap({ attachments in
+            attachments.photo
+        }), let firstPhoto = photos.first else {  //З масива фото(photos) беремо першу фото та передаємо на вихід
+            return nil
+        }
+        return FeedViewModel.FeedCellPhotoAttachement(photoUrlString: firstPhoto.srcBIG,
+                                                      width: firstPhoto.width,
+                                                      height: firstPhoto.height)
     }
 }
 

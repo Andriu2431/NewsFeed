@@ -33,6 +33,44 @@ struct FeedItem: Decodable {
     let likes: CountableItem?
     let reposts: CountableItem?
     let views: CountableItem?
+    let attachments: [Attachments]?
+}
+
+//Приймаємо щось що є в пості
+struct Attachments: Decodable {
+    let photo: Photo?
+}
+
+//Фото
+struct Photo: Decodable {
+    //Розміра фото, тип, url для скачування
+    let sizes: [PhotoSize]
+    
+    //Отримуємо значення того розміру якого шукали
+    var height: Int { return getPropperISize().height }
+    var width: Int { return getPropperISize().width }
+    var srcBIG: String { return getPropperISize().url }
+    
+    //Для того щоб ми вибрали собі розмір фото
+    private func getPropperISize() -> PhotoSize {
+        //Шукаємо розмір x, коли находимо то вертаємо його
+        if let sizeX = sizes.first(where: { $0.type == "x" }) {
+            return sizeX
+        } else if let fallBackSize = sizes.last {
+            //Якщо не знаходимо того розміру який шукаємо, то вертаємо остатній з масива
+            return fallBackSize
+        } else {
+            //Якщо нічого не найшли то вертаємо
+            return PhotoSize(type: "wrong image", url: "wrong image", width: 0, height: 0)
+        }
+    }
+}
+
+struct PhotoSize: Decodable {
+    let type: String
+    let url: String
+    let width: Int
+    let height: Int
 }
 
 //Кількість лайків, коментів...

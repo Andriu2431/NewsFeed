@@ -10,8 +10,8 @@ import UIKit
 //Тут отримуємо фото поста через url
 class WebImageView: UIImageView {
     
-    func set(imageURL: String) {
-        guard let url = URL(string: imageURL) else { return }
+    func set(imageURL: String?) {
+        guard let imageURL = imageURL, let url = URL(string: imageURL) else { return }
         
         //Перевіримо чи є вже така фотка в кеші, для того щоб одну і туж фотку не підгружати пару разів
         if let cachedResponse = URLCache.shared.cachedResponse(for: URLRequest(url: url)) {
