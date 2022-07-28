@@ -25,7 +25,7 @@ class NewsFeedCell: UITableViewCell {
     //Ідентифікатор контейнера
     static let reuseId = "NewsFeedCell"
     
-    @IBOutlet weak var iconImageView: UIImageView!
+    @IBOutlet weak var iconImageView: WebImageView!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var postLabel: UILabel!
@@ -40,6 +40,7 @@ class NewsFeedCell: UITableViewCell {
     
     //Метод через який будемо отримувати данні з ViewControllera - передавати будемо через модель данних, модель буде завязана на протоколі тому приймаємо тип протокола. Дані зразу присвоюємо
     func set(viewModel: FeedCellViewModel) {
+        iconImageView.set(imageURL: viewModel.iconUrlString)
         nameLabel.text = viewModel.name
         dateLabel.text = viewModel.date
         postLabel.text = viewModel.text
