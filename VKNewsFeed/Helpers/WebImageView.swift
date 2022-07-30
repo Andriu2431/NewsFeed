@@ -11,7 +11,11 @@ import UIKit
 class WebImageView: UIImageView {
     
     func set(imageURL: String?) {
-        guard let imageURL = imageURL, let url = URL(string: imageURL) else { return }
+        
+        //Витягуємо фото
+        guard let imageURL = imageURL, let url = URL(string: imageURL) else {
+            self.image = nil
+            return }
         
         //Перевіримо чи є вже така фотка в кеші, для того щоб одну і туж фотку не підгружати пару разів
         if let cachedResponse = URLCache.shared.cachedResponse(for: URLRequest(url: url)) {

@@ -16,6 +16,9 @@ protocol NewsFeedPresentationLogic {
 class NewsFeedPresenter: NewsFeedPresentationLogic {
     weak var viewController: NewsFeedDisplayLogic?
     
+    //Змінна яка буде рахувати розмір для контейнерів
+    var cellLayoutCalculator: FeedCellLayoutCalculatorProtocol = FeedCellLayoutCalculator()
+    
     var dateFormater: DateFormatter {
         let dt = DateFormatter()
         dt.locale = Locale(identifier: "uk_UK")
@@ -48,10 +51,13 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
         let profile = self.profile(for: feedItem.sourceId, profiles: profiles, groups: groups)
         
         //Отримуємо фото поста
-        let photoAttachement = self.photoAttachement(feedItem: feedItem)
+        let photoAttachment = self.photoAttachement(feedItem: feedItem)
         
         let date = Date(timeIntervalSince1970: feedItem.date)
         let dateTitle = dateFormater.string(from: date)
+        
+        //Отримуємо розмір тексту поста та розмір фото в пості
+        let sizes = cellLayoutCalculator.sizes(postText: feedItem.text, photoAttachment: photoAttachment)
         
         //Тобто в модель поста передаємо отриманні данні але в простих типах. Тобто ми маємо данні FeedItem але там вони в своїх типах а нам потрібно їх привести до простих типів FeedViewModel.Cell.
         return FeedViewModel.Cell.init(iconUrlString: profile.photo,
@@ -62,7 +68,8 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
                                        comments: String(feedItem.comments?.count ?? 0),
                                        shares: String(feedItem.reposts?.count ?? 0),
                                        views: String(feedItem.views?.count ?? 0),
-                                       photoAttachement: photoAttachement)
+                                       photoAttachment: photoAttachment,
+                                       sizes: sizes)
     }
     
     //Метод який буде шукати інформацію для користувача

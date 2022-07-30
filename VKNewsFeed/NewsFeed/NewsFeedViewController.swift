@@ -48,6 +48,12 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic {
         //Рейструємо контейнер через xib файл
         table.register(UINib(nibName: "NewsFeedCell", bundle: nil), forCellReuseIdentifier: NewsFeedCell.reuseId)
         
+        title = "News Feed"
+        //Колір view, table
+        table.separatorStyle = .none
+        table.backgroundColor = .clear
+        view.backgroundColor = #colorLiteral(red: 0.9568627477, green: 0.6588235497, blue: 0.5450980663, alpha: 1)
+        
         //Відправляємо запит до interactor для отримання даних якими заповнимо контейнери.
         interactor?.makeRequest(request: .getNewsFeed)
     }
@@ -83,6 +89,9 @@ extension NewsFeedViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 212
+        //Беремо пост по indexPath
+        let cellViewModel = feedViewModel.cells[indexPath.row]
+        //В поста беремо розмір 
+        return cellViewModel.sizes.totalHeight
     }
 }
