@@ -47,6 +47,8 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic {
         
         //Рейструємо контейнер через xib файл
         table.register(UINib(nibName: "NewsFeedCell", bundle: nil), forCellReuseIdentifier: NewsFeedCell.reuseId)
+        //Рейструємо контейнер через код
+        table.register(NewsFeedCodeCell.self, forCellReuseIdentifier: NewsFeedCodeCell.reuseId)
         
         title = "News Feed"
         //Колір view, table
@@ -80,7 +82,12 @@ extension NewsFeedViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: NewsFeedCell.reuseId, for: indexPath) as! NewsFeedCell
+        //це якщо через xib
+//        let cell = tableView.dequeueReusableCell(withIdentifier: NewsFeedCell.reuseId, for: indexPath) as! NewsFeedCell
+        
+        //це якщо через код створюємо контейнер
+        let cell = tableView.dequeueReusableCell(withIdentifier: NewsFeedCodeCell.reuseId, for: indexPath) as! NewsFeedCodeCell
+        
         //Пост з моделі витягуємо по індексу
         let cellViewModel = feedViewModel.cells[indexPath.row]
         //Беремо пост по індексу та передаємо в метод який буде заповнювати контейнер данними
@@ -91,7 +98,7 @@ extension NewsFeedViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         //Беремо пост по indexPath
         let cellViewModel = feedViewModel.cells[indexPath.row]
-        //В поста беремо розмір 
+        //В поста беремо розмір
         return cellViewModel.sizes.totalHeight
     }
 }
