@@ -9,7 +9,7 @@ import UIKit
 
 //Протокол який має метод вираховування розміру
 protocol FeedCellLayoutCalculatorProtocol {
-    func sizes(postText: String?, photoAttachment: FeedCellPhotoAttachementViewModel?) -> FeedCellSizes
+    func sizes(postText: String?, photoAttachments: [FeedCellPhotoAttachementViewModel]) -> FeedCellSizes
 }
 
 //Структура яка реалізовує протокол розмірів
@@ -26,13 +26,13 @@ final class FeedCellLayoutCalculator: FeedCellLayoutCalculatorProtocol {
     //Ширина нашого екрана
     private let screenWith: CGFloat
     
-    //По дефолту передаємо ширину екрану 
+    //По дефолту передаємо ширину екрану
     init(screenWith: CGFloat = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)) {
         self.screenWith = screenWith
     }
     
     //Функція яка вже буде рахувати розмір та вертати його через протокол FeedCellSizes
-    func sizes(postText: String?, photoAttachment: FeedCellPhotoAttachementViewModel?) -> FeedCellSizes {
+    func sizes(postText: String?, photoAttachments: [FeedCellPhotoAttachementViewModel]) -> FeedCellSizes {
         
         //Отримуємо ширину cardView
         let cardViewWidth = screenWith - Constants.cardInsets.left - Constants.cardInsets.right
@@ -57,15 +57,22 @@ final class FeedCellLayoutCalculator: FeedCellLayoutCalculatorProtocol {
         let attachementTop = postLabelFrame.size == CGSize.zero ? Constants.postLabelInsets.top : postLabelFrame.maxY + Constants.postLabelInsets.bottom
         
         var attachementFrame = CGRect(origin: CGPoint(x: 0, y: attachementTop),
-                                    size: CGSize.zero)
+                                      size: CGSize.zero)
         
-        //Перевіремо чи прийшла фото
-        if let attachment = photoAttachment {
+        //Перевіремо чи прийшла фото, якщо так то скільки їх
+        if let attachment = photoAttachments.first {
             //Рахуємо співвідношення сторін фото яка прийде
             let photoHeight: Float = Float(attachment.height)
             let photoWidth: Float = Float(attachment.width)
             let ratio = photoHeight / photoWidth
-            attachementFrame.size = CGSize(width: cardViewWidth, height: cardViewWidth * CGFloat(ratio))
+            
+            //Якщо фотка лише одна
+            if photoAttachments.count == 1 {
+                attachementFrame.size = CGSize(width: cardViewWidth, height: cardViewWidth * CGFloat(ratio))
+            } else if photoAttachments.count > 1 {
+                //Якщо більше ніж одна фото
+                attachementFrame.size = CGSize(width: cardViewWidth, height: cardViewWidth * CGFloat(ratio))
+            }
         }
         
         //MARK: bottomViewFrame

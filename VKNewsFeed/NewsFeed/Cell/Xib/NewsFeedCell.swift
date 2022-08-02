@@ -11,7 +11,7 @@ import UIKit
 //Реалізує модель данних
 protocol FeedCellViewModel {
     var iconUrlString: String { get }
-    var photoAttachment: FeedCellPhotoAttachementViewModel? { get }
+    var photoAttachments: [FeedCellPhotoAttachementViewModel] { get }
     var name: String { get }
     var date: String { get }
     var text: String? { get }
@@ -94,11 +94,10 @@ class NewsFeedCell: UITableViewCell {
         bottomView.frame = viewModel.sizes.bottomViewFrame
         
         //Перевіремо чи отримали ми фото поста
-        if let photoAttachment = viewModel.photoAttachment {
+        if let photoAttachment = viewModel.photoAttachments.first, viewModel.photoAttachments.count == 1 {
             postImageView.set(imageURL: photoAttachment.photoUrlString)
             postImageView.isHidden = false
         } else {
-            //Там де нема фото то postImageView скриваєм
             postImageView.isHidden = true
         }
     }

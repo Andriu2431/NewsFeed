@@ -50,7 +50,7 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic {
         //Рейструємо контейнер через код
         table.register(NewsFeedCodeCell.self, forCellReuseIdentifier: NewsFeedCodeCell.reuseId)
         
-        title = "News Feed"
+        title = "News"
         //Колір view, table
         table.separatorStyle = .none
         table.backgroundColor = .clear

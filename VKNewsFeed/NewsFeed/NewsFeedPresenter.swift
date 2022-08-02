@@ -50,14 +50,14 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
         
         let profile = self.profile(for: feedItem.sourceId, profiles: profiles, groups: groups)
         
-        //Отримуємо фото поста
-        let photoAttachment = self.photoAttachement(feedItem: feedItem)
+        //Отримуємо масив фото поста
+        let photoAttachments = self.photoAttachments(feedItem: feedItem)
         
         let date = Date(timeIntervalSince1970: feedItem.date)
         let dateTitle = dateFormater.string(from: date)
         
         //Отримуємо розмір тексту поста та розмір фото в пості
-        let sizes = cellLayoutCalculator.sizes(postText: feedItem.text, photoAttachment: photoAttachment)
+        let sizes = cellLayoutCalculator.sizes(postText: feedItem.text, photoAttachments: photoAttachments)
         
         //Тобто в модель поста передаємо отриманні данні але в простих типах. Тобто ми маємо данні FeedItem але там вони в своїх типах а нам потрібно їх привести до простих типів FeedViewModel.Cell.
         return FeedViewModel.Cell.init(iconUrlString: profile.photo,
@@ -68,7 +68,7 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
                                        comments: String(feedItem.comments?.count ?? 0),
                                        shares: String(feedItem.reposts?.count ?? 0),
                                        views: String(feedItem.views?.count ?? 0),
-                                       photoAttachment: photoAttachment,
+                                       photoAttachments: photoAttachments,
                                        sizes: sizes)
     }
     
@@ -87,18 +87,19 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
         return profileRepresentable!
     }
     
-    //Метод який дістає фото
-    private func photoAttachement(feedItem: FeedItem) -> FeedViewModel.FeedCellPhotoAttachement? {
+    //Метод який вертає масив фото поста
+    private func photoAttachments(feedItem: FeedItem) -> [FeedViewModel.FeedCellPhotoAttachement] {
+        //Перевіримо чи є attachment(фото, відео, гіфки)
+        guard let attachment = feedItem.attachments else { return [] }
         
-        //Проходимось по attachments, якщо находимо фото то передаємо в масив photos
-        guard let photos = feedItem.attachments?.compactMap({ attachments in
-            attachments.photo
-        }), let firstPhoto = photos.first else {  //З масива фото(photos) беремо першу фото та передаємо на вихід
-            return nil
+        //Дивимось чи є якась фото в attachment
+        return attachment.compactMap { attachment -> FeedViewModel.FeedCellPhotoAttachement? in
+            guard let photo = attachment.photo else { return nil }
+            //Вертаємо фото
+            return FeedViewModel.FeedCellPhotoAttachement.init(photoUrlString: photo.srcBIG,
+                                                               width: photo.width,
+                                                               height: photo.height)
         }
-        return FeedViewModel.FeedCellPhotoAttachement(photoUrlString: firstPhoto.srcBIG,
-                                                      width: firstPhoto.width,
-                                                      height: firstPhoto.height)
     }
 }
 
