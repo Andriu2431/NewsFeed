@@ -7,11 +7,19 @@
 
 import UIKit
 
+//Протокол який буде делегувати
+protocol NewsFeedCodeCellDelegate: AnyObject {
+    func revealPost(for cell: NewsFeedCodeCell)
+}
+
 //Тут зробимо констейни через код
 final class NewsFeedCodeCell: UITableViewCell {
     
     //Ідентифікатор
     static let reuseId = "NewsFeedCodeCell"
+    
+    //Делегат через протокол
+    weak var delegate: NewsFeedCodeCellDelegate?
     
     //Перший слой
     let cardView: UIView = {
@@ -34,6 +42,16 @@ final class NewsFeedCodeCell: UITableViewCell {
         label.font = Constants.postLabelFont
         label.textColor = #colorLiteral(red: 0.2273307443, green: 0.2323131561, blue: 0.2370453477, alpha: 1)
         return label
+    }()
+    
+    let moreTextButton: UIButton = {
+        let button = UIButton()
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        button.setTitleColor(#colorLiteral(red: 0.4, green: 0.6235294118, blue: 0.831372549, alpha: 1), for: .normal)
+        button.contentHorizontalAlignment = .left
+        button.contentVerticalAlignment = .center
+        button.setTitle("Показати повністю...", for: .normal)
+        return button
     }()
     
     //Колекція фото
@@ -173,7 +191,10 @@ final class NewsFeedCodeCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-
+        
+        //Для того щоб можна було взаємодіяти з користувачем
+        contentView.isUserInteractionEnabled = true
+        
         //Округлимо іконку групи або профіля
         iconImageView.layer.cornerRadius = Constants.topViewHeight / 2
         iconImageView.clipsToBounds = true
@@ -184,11 +205,20 @@ final class NewsFeedCodeCell: UITableViewCell {
         cardView.layer.cornerRadius = 10
         cardView.clipsToBounds = true
         
+        moreTextButton.addTarget(self, action: #selector(moreTextButtonTouch), for: .touchUpInside)
+        
         overlayFirstLayer() //Перший слой
         overlaySecondLayer()  //Другий слой
         overlayThirdLayerOnTopView()  //Третій слой на TopView
         overlayThirdLayerOnBottomView() //Третій слой на BottomView
         overlayFourthLayerOnBottomViewViews()  //Четвертий слой на bottomView
+    }
+    
+    //Тап по кнопці
+    @objc func moreTextButtonTouch() {
+        print("123")
+        //Перетаємо пост
+        delegate?.revealPost(for: self)
     }
     
     
@@ -206,6 +236,7 @@ final class NewsFeedCodeCell: UITableViewCell {
         
         postLabel.frame = viewModel.sizes.postLabelFrame
         bottomView.frame = viewModel.sizes.bottomViewFrame
+        moreTextButton.frame = viewModel.sizes.moreTextButtonFrame
         
         //Перевіремо чи отримали ми фото поста та в залежності від того скільки їх буде різне виконання
         if let photoAttachment = viewModel.photoAttachments.first, viewModel.photoAttachments.count == 1 {
@@ -240,6 +271,7 @@ final class NewsFeedCodeCell: UITableViewCell {
     private func overlaySecondLayer() {
         cardView.addSubview(topView)
         cardView.addSubview(postLabel)
+        cardView.addSubview(moreTextButton)
         cardView.addSubview(postImageView)
         cardView.addSubview(galleryCollectionView)
         cardView.addSubview(bottomView)
@@ -251,6 +283,8 @@ final class NewsFeedCodeCell: UITableViewCell {
         topView.heightAnchor.constraint(equalToConstant: Constants.topViewHeight).isActive = true
 
         //postLabel constrains - непотрібні бо задаються динамічно
+        
+        //moreTextButton constrains - непотрібні бо задаються динамічно
 
         //postImageView constrains - непотрібні бо задаються динамічно
 

@@ -15,6 +15,7 @@ protocol FeedCellLayoutCalculatorProtocol {
 //Структура яка реалізовує протокол розмірів
 struct Sizes: FeedCellSizes {
     var postLabelFrame: CGRect
+    var moreTextButtonFrame: CGRect
     var attachementFrame: CGRect
     var bottomViewFrame: CGRect
     var totalHeight: CGFloat
@@ -34,10 +35,14 @@ final class FeedCellLayoutCalculator: FeedCellLayoutCalculatorProtocol {
     //Функція яка вже буде рахувати розмір та вертати його через протокол FeedCellSizes
     func sizes(postText: String?, photoAttachments: [FeedCellPhotoAttachementViewModel]) -> FeedCellSizes {
         
+        //Перевіримо чи текст прийшов більший ніж дозволено чи ні
+        var showMoreTextButton = false
+        
         //Отримуємо ширину cardView
         let cardViewWidth = screenWith - Constants.cardInsets.left - Constants.cardInsets.right
         
         //MARK: postLabelFrame
+        
         var postLabelFrame = CGRect(origin: CGPoint(x: Constants.postLabelInsets.left, y: Constants.postLabelInsets.top),
                                     size: CGSize.zero)
         
@@ -46,15 +51,41 @@ final class FeedCellLayoutCalculator: FeedCellLayoutCalculatorProtocol {
             //Ширина лейбла
             let width = cardViewWidth - Constants.postLabelInsets.left - Constants.postLabelInsets.right
             //Висота
-            let height = text.height(width: width, font: Constants.postLabelFont)
+            var height = text.height(width: width, font: Constants.postLabelFont)
+            
+            //Отримуємо який ліміт по тексту
+            let limitHeight = Constants.postLabelFont.lineHeight * Constants.minifiedPostLimitLines
+            
+            //Перевіримо чи висота тексту більша за дозволену висоту
+            if height > limitHeight {
+                //Задамо дозволену висоту для тексту
+                height = Constants.postLabelFont.lineHeight * Constants.minifiedPostLines
+                showMoreTextButton = true
+            }
             
             postLabelFrame.size = CGSize(width: width, height: height)
         }
         
+        //MARK: moreTextButtonFrame
+        //Розмір кнопки
+        var moreTextButtonSize = CGSize.zero
+        
+        //Перевіримо чи був текст більший чи ні
+        if showMoreTextButton {
+            //Якщо розмір прийшов більший то задаємо розмір кнопки, щоб вона була на екрані
+            moreTextButtonSize = Constants.moreTextButtonSize
+        }
+        
+        //Місце розташування на екрані задамо
+        let moreTextButtonOrigin = CGPoint(x: Constants.moreTextButtonInsets.left, y: postLabelFrame.maxY)
+        
+        //Задали розміра та розположення кнопки
+        let moreTextButtonFrame = CGRect(origin: moreTextButtonOrigin, size: moreTextButtonSize)
+        
         //MARK: attachementFrame
         
-        //Якщо postLabelFrame = 0, тоді attachementTop = Constants.postLabelInsets.top, якащо postLabelFrame != 0, то postLabelFrame.maxY + Constants.postLabelInsets.bottom
-        let attachementTop = postLabelFrame.size == CGSize.zero ? Constants.postLabelInsets.top : postLabelFrame.maxY + Constants.postLabelInsets.bottom
+        //Якщо postLabelFrame = 0, тоді attachementTop = Constants.postLabelInsets.top, якащо postLabelFrame != 0, то moreTextButtonFrame.maxY + Constants.postLabelInsets.bottom
+        let attachementTop = postLabelFrame.size == CGSize.zero ? Constants.postLabelInsets.top : moreTextButtonFrame.maxY + Constants.postLabelInsets.bottom
         
         var attachementFrame = CGRect(origin: CGPoint(x: 0, y: attachementTop),
                                       size: CGSize.zero)
@@ -86,6 +117,7 @@ final class FeedCellLayoutCalculator: FeedCellLayoutCalculatorProtocol {
         let totalHeight = bottomViewFrame.maxY + Constants.cardInsets.bottom
         
         return Sizes(postLabelFrame: postLabelFrame,
+                     moreTextButtonFrame: moreTextButtonFrame,
                      attachementFrame: attachementFrame,
                      bottomViewFrame: bottomViewFrame,
                      totalHeight: totalHeight)

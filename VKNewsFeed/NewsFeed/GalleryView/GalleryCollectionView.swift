@@ -41,7 +41,7 @@ class GalleryColectionView: UICollectionView {
 }
 
 
-extension GalleryColectionView: UICollectionViewDelegate, UICollectionViewDataSource {
+extension GalleryColectionView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return photos.count
     }
@@ -52,5 +52,10 @@ extension GalleryColectionView: UICollectionViewDelegate, UICollectionViewDataSo
         return cell
     }
     
+    //Метод який реалізує розміри для collectionView
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: frame.width, height: frame.height)
+    }
+
     
 }

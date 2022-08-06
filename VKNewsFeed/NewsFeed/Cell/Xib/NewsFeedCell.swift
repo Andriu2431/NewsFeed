@@ -28,6 +28,7 @@ protocol FeedCellSizes {
     var attachementFrame: CGRect { get }
     var bottomViewFrame: CGRect { get }
     var totalHeight: CGFloat  { get }
+    var moreTextButtonFrame: CGRect { get }
 }
 
 //Протокол який реалізовує фотографії для поста

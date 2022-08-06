@@ -13,8 +13,8 @@ protocol NewsFeedDisplayLogic: AnyObject {
 }
 
 //Контроллер новин
-class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic {
-    
+class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCodeCellDelegate {
+ 
     //Тримає бізнес логіку, але завязаний на протокол
     var interactor: NewsFeedBusinessLogic?
     var router: (NSObjectProtocol & NewsFeedRoutingLogic)?
@@ -70,6 +70,12 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic {
             table.reloadData()
         }
     }
+    
+    //MARK: NewsFeedCodeCellDelegate
+    
+    func revealPost(for cell: NewsFeedCodeCell) {
+        print("Done")
+    }
 }
     
 
@@ -87,11 +93,11 @@ extension NewsFeedViewController: UITableViewDelegate, UITableViewDataSource {
         
         //це якщо через код створюємо контейнер
         let cell = tableView.dequeueReusableCell(withIdentifier: NewsFeedCodeCell.reuseId, for: indexPath) as! NewsFeedCodeCell
-        
         //Пост з моделі витягуємо по індексу
         let cellViewModel = feedViewModel.cells[indexPath.row]
         //Беремо пост по індексу та передаємо в метод який буде заповнювати контейнер данними
         cell.set(viewModel: cellViewModel)
+        cell.delegate = self
         return cell
     }
     
