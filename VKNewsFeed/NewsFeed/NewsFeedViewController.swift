@@ -74,7 +74,13 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
     //MARK: NewsFeedCodeCellDelegate
     
     func revealPost(for cell: NewsFeedCodeCell) {
-        print("Done")
+        //Дізнаємось indexPath контейнера в якому хочемо розкрити текст
+        guard let indexPath = table.indexPath(for: cell) else { return }
+        //Отримуємо інформацію про контейнер який хочемо розкрити
+        let cellViewModel = feedViewModel.cells[indexPath.row]
+        
+        //Запит до інтерактора
+        interactor?.makeRequest(request: .revealPostIds(postId: cellViewModel.postId))
     }
 }
     

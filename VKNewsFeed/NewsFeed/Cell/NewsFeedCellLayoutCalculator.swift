@@ -9,7 +9,7 @@ import UIKit
 
 //Протокол який має метод вираховування розміру
 protocol FeedCellLayoutCalculatorProtocol {
-    func sizes(postText: String?, photoAttachments: [FeedCellPhotoAttachementViewModel]) -> FeedCellSizes
+    func sizes(postText: String?, photoAttachments: [FeedCellPhotoAttachementViewModel], isFullSizedPost: Bool) -> FeedCellSizes
 }
 
 //Структура яка реалізовує протокол розмірів
@@ -33,7 +33,7 @@ final class FeedCellLayoutCalculator: FeedCellLayoutCalculatorProtocol {
     }
     
     //Функція яка вже буде рахувати розмір та вертати його через протокол FeedCellSizes
-    func sizes(postText: String?, photoAttachments: [FeedCellPhotoAttachementViewModel]) -> FeedCellSizes {
+    func sizes(postText: String?, photoAttachments: [FeedCellPhotoAttachementViewModel], isFullSizedPost: Bool) -> FeedCellSizes {
         
         //Перевіримо чи текст прийшов більший ніж дозволено чи ні
         var showMoreTextButton = false
@@ -57,7 +57,7 @@ final class FeedCellLayoutCalculator: FeedCellLayoutCalculatorProtocol {
             let limitHeight = Constants.postLabelFont.lineHeight * Constants.minifiedPostLimitLines
             
             //Перевіримо чи висота тексту більша за дозволену висоту
-            if height > limitHeight {
+            if !isFullSizedPost && height > limitHeight {
                 //Задамо дозволену висоту для тексту
                 height = Constants.postLabelFont.lineHeight * Constants.minifiedPostLines
                 showMoreTextButton = true

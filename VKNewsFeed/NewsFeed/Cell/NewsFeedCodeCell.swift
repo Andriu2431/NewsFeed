@@ -216,7 +216,6 @@ final class NewsFeedCodeCell: UITableViewCell {
     
     //Тап по кнопці
     @objc func moreTextButtonTouch() {
-        print("123")
         //Перетаємо пост
         delegate?.revealPost(for: self)
     }

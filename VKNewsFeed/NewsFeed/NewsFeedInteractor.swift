@@ -19,6 +19,11 @@ class NewsFeedInteractor: NewsFeedBusinessLogic {
     //Worker
     var service: NewsFeedService?
     
+    //Масив postId тих постів в яких розвертаємо текст - будемо передавати його в presenter
+    private var revealedPostIds = [Int]()
+    //Створимо всластивість в яку передамо пости які прийшли
+    private var feedResponse: FeedResponse?
+    
     //Передаємо NetworkService через який зробили запит та оримаємо відповідь
     private var fetcher: DataFetcherProtocol = NetworkDataFetcher(networking: NetworkService())
     
@@ -32,12 +37,19 @@ class NewsFeedInteractor: NewsFeedBusinessLogic {
         case .getNewsFeed:
             //Робимо запит та отримуємо пости
             fetcher.getFeed { [weak self] feedResponse in
-                
-                guard let feedResponse = feedResponse else { return }
-                
-                //Передаємо пости в Presenter
-                self?.presenter?.presentData(response: .presentNewsFeed(feed: feedResponse))
+                self?.feedResponse = feedResponse
+                self?.presentFeed()
             }
+            
+        case .revealPostIds(postId: let postId):
+            revealedPostIds.append(postId)
+            presentFeed()
         }
+    }
+    
+    private func presentFeed() {
+        guard let feedResponse = feedResponse else { return }
+        //Передаємо пости в presenter
+        presenter?.presentData(response: .presentNewsFeed(feed: feedResponse, revealedPostIds: revealedPostIds))
     }
 }

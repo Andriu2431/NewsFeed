@@ -30,12 +30,11 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
         
         //Обробимо дані які передаємо в controller
         switch response {
-        case .presentNewsFeed(feed: let feed):
-            
+        case .presentNewsFeed(feed: let feed, let revealedPostIds):
             //Беремо масив постів, проходимось по ньому
             let cells = feed.items.map { feedItem in
                 //Кожен пост приводимо до простих типві
-                cellViewModel(from: feedItem, profiles: feed.profiles, groups: feed.groups)
+                cellViewModel(from: feedItem, profiles: feed.profiles, groups: feed.groups, revealedPostIds: revealedPostIds)
             }
             
             //З масиву постів робимо дані для одного поста
@@ -46,7 +45,7 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
     }
     
     //Метод в якому будемо робити потрібні нам дані
-    private func cellViewModel(from feedItem: FeedItem, profiles: [Profile], groups: [Group]) -> FeedViewModel.Cell {
+    private func cellViewModel(from feedItem: FeedItem, profiles: [Profile], groups: [Group], revealedPostIds: [Int]) -> FeedViewModel.Cell {
         
         let profile = self.profile(for: feedItem.sourceId, profiles: profiles, groups: groups)
         
@@ -56,11 +55,17 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
         let date = Date(timeIntervalSince1970: feedItem.date)
         let dateTitle = dateFormater.string(from: date)
         
+        //Перевіримо чи revealedPostIds співпав з postId контейнера
+        let isFullSized = revealedPostIds.contains { postId in
+            return postId == feedItem.postId
+        }
+        
         //Отримуємо розмір тексту поста та розмір фото в пості
-        let sizes = cellLayoutCalculator.sizes(postText: feedItem.text, photoAttachments: photoAttachments)
+        let sizes = cellLayoutCalculator.sizes(postText: feedItem.text, photoAttachments: photoAttachments, isFullSizedPost: isFullSized)
         
         //Тобто в модель поста передаємо отриманні данні але в простих типах. Тобто ми маємо данні FeedItem але там вони в своїх типах а нам потрібно їх привести до простих типів FeedViewModel.Cell.
-        return FeedViewModel.Cell.init(iconUrlString: profile.photo,
+        return FeedViewModel.Cell.init(postId: feedItem.postId,
+                                       iconUrlString: profile.photo,
                                        name: profile.name,
                                        date: dateTitle,
                                        text: feedItem.text,
