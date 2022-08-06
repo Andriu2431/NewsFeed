@@ -9,39 +9,33 @@ import UIKit
 
 //Тут будемо створювати ColectionView
 
-class GalleryColectionView: UICollectionView {
+class GalleryColectionView: UICollectionView, UICollectionViewDelegate, UICollectionViewDataSource {
     
     //Масив фото яким буде заповнюватись ColectionView
     var photos = [FeedCellPhotoAttachementViewModel]()
     
     init() {
-        //Як будуть розкладатись контейнери
-        let layout = UICollectionViewFlowLayout()
-        //Скажемо що він буде горизонтальним
-        layout.scrollDirection = .horizontal
-        super.init(frame: .zero, collectionViewLayout: layout)
+        let rowLayout = RowLayout()
+        super.init(frame: .zero, collectionViewLayout: rowLayout)
         
         delegate = self
         dataSource = self
+        rowLayout.delegate = self
         
-        backgroundColor = .gray
+        backgroundColor = .white
+        showsVerticalScrollIndicator = false
+        showsHorizontalScrollIndicator = false
         
         register(GalleryCollectionViewCell.self, forCellWithReuseIdentifier: GalleryCollectionViewCell.reuseId)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     //Мктод який приймає масив фоток для заповнення ColectionView
     func set(photos: [FeedCellPhotoAttachementViewModel]) {
         self.photos = photos
+        contentOffset = CGPoint.zero
         reloadData()
     }
-}
-
-
-extension GalleryColectionView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return photos.count
     }
@@ -52,10 +46,20 @@ extension GalleryColectionView: UICollectionViewDelegate, UICollectionViewDataSo
         return cell
     }
     
-    //Метод який реалізує розміри для collectionView
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: frame.width, height: frame.height)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
+}
 
+
+extension GalleryColectionView: RowLayoutDelegate {
     
+    //Вертаємо розмір фото
+    func collectionView(_ collectionView: UICollectionView, photoAtIndexPath indexPath: IndexPath) -> CGSize {
+        //Витягуємо ширину
+        let width = photos[indexPath.row].width
+        let height = photos[indexPath.row].height
+        
+        return CGSize(width: width, height: height)
+    }
 }

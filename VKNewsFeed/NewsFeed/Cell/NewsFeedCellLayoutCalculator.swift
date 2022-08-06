@@ -102,7 +102,17 @@ final class FeedCellLayoutCalculator: FeedCellLayoutCalculatorProtocol {
                 attachementFrame.size = CGSize(width: cardViewWidth, height: cardViewWidth * CGFloat(ratio))
             } else if photoAttachments.count > 1 {
                 //Якщо більше ніж одна фото
-                attachementFrame.size = CGSize(width: cardViewWidth, height: cardViewWidth * CGFloat(ratio))
+                var photos = [CGSize]()
+                //Проходимось по всім фото та дістаємо розміра. Їх записуємо в масив
+                for photo in photoAttachments {
+                    let photoSize = CGSize(width: CGFloat(photo.width), height: CGFloat(photo.height))
+                    photos.append(photoSize)
+                }
+                
+                //Передаємо масив з розмірами - отримуємо розмір найменшої фото
+                let rowHeight = RowLayout.rowHeightCounter(superViewWidth: cardViewWidth, photosArray: photos)
+                //Задаєм цей розмір для attachementFrame
+                attachementFrame.size = CGSize(width: cardViewWidth, height: rowHeight!)
             }
         }
         

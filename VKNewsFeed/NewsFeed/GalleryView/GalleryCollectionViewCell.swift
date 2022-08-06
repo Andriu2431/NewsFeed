@@ -18,15 +18,14 @@ class GalleryCollectionViewCell: UICollectionViewCell {
     let myImageView: WebImageView = {
         let imageView = WebImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
-        imageView.backgroundColor = .yellow
+        imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = #colorLiteral(red: 0.9117177725, green: 0.918438971, blue: 0.927837193, alpha: 1)
         return imageView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)
         addSubview(myImageView)
         
         //myImageView constraints
@@ -41,6 +40,16 @@ class GalleryCollectionViewCell: UICollectionViewCell {
     //Методя кий приймає силку для скачування фото
     func set(imageUrl: String?) {
         myImageView.set(imageURL: imageUrl)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        //Округлим фото та задамо тіні
+        myImageView.layer.masksToBounds = true
+        myImageView.layer.cornerRadius = 10
+        self.layer.shadowRadius = 3
+        layer.shadowOpacity = 0.4
+        layer.shadowOffset = CGSize(width: 2.5, height: 4)
     }
     
     required init?(coder: NSCoder) {
