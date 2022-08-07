@@ -20,7 +20,7 @@ class RowLayout: UICollectionViewLayout {
     weak var delegate: RowLayoutDelegate!
 
     //Кількість строк
-    static var numbersOfRows = 1
+    static var numbersOfRows = 2
     //Відсупи від країв
     fileprivate var cellPadding: CGFloat = 8
 

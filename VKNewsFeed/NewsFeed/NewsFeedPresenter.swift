@@ -41,6 +41,10 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
             let feedViewModel = FeedViewModel(cells: cells)
             //Передаємо цей пост в ViewController
             viewController?.displayData(viewModel: .displayNewsFeed(feedViewModel: feedViewModel))
+        case .presentUserInfo(user: let user):
+            //Отримуємо лінку на фото та передаємо її в модель данних
+            let userViewModel = UserViewModel.init(photoUrlString: user?.photo100)
+            viewController?.displayData(viewModel: .displayUser(userViewModel: userViewModel))
         }
     }
     

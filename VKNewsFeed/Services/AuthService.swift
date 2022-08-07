@@ -35,6 +35,11 @@ final class AuthService: NSObject, VKSdkDelegate, VKSdkUIDelegate {
         return VKSdk.accessToken().accessToken
     }
     
+    //Отримаємо userId для отримання данних про користувача
+    var userId: String? {
+        return VKSdk.accessToken().userId
+    }
+    
     override init() {
         //Ініціалізуємо через id програми
         vkSdk = VKSdk.initialize(withAppId: appId)

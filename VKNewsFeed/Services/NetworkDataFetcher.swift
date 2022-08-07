@@ -10,15 +10,19 @@ import Foundation
 //Протокол який буде перетворювати отримані JSON дані в формат який нам потрібен
 protocol DataFetcherProtocol {
     func getFeed(response: @escaping (FeedResponse?) -> Void)
+    func getUser(response: @escaping (UserResponse?) -> Void)
 }
 
 //6 відео 16 хв
 struct NetworkDataFetcher: DataFetcherProtocol {
     
+    //Екземпляри
     let networking: NetworkingProtocol
+    private let authService: AuthService
     
-    init(networking: NetworkingProtocol) {
+    init(networking: NetworkingProtocol, authService: AuthService = AuthService.shared) {
         self.networking = networking
+        self.authService = authService
     }
     
     //Отримуємо дані в потрібному форматі - тобто отримуємо уже пости
@@ -38,6 +42,26 @@ struct NetworkDataFetcher: DataFetcherProtocol {
             response(decoded?.response)
         }
     }
+    
+    //Запит для отримання данних про користувача
+    func getUser(response: @escaping (UserResponse?) -> Void) {
+        
+        //Отримаємо userId
+        guard let userId = authService.userId else { return }
+        let params = ["user_ids": userId, "fields": "photo_100"]
+        
+        //Запит
+        networking.request(path: API.user, params: params) { data, error in
+            if let error = error {
+                print("Error recevied requesting data \(error.localizedDescription)")
+                response(nil)
+            }
+            
+            let decoded = self.decodeJSON(type: UserResponseWrapped.self, from: data)
+            response(decoded?.response.first)
+        }
+    }
+    
     
     //Метод буде робити загальний response, для того щоб не робити його багато разів зробимо один раз та протсо будемо викликати цей метод
     private func decodeJSON<T: Decodable>(type: T.Type, from: Data?) -> T? {

@@ -21,6 +21,8 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
 
     //Створюємо модель постів
     private var feedViewModel = FeedViewModel.init(cells: [])
+    //Екземпляр TitleView
+    private var titleView = TitleView()
     
     @IBOutlet weak var table: UITableView!
     
@@ -44,6 +46,7 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+        setupTopBars()
         
         //Рейструємо контейнер через xib файл
         table.register(UINib(nibName: "NewsFeedCell", bundle: nil), forCellReuseIdentifier: NewsFeedCell.reuseId)
@@ -58,6 +61,18 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
         
         //Відправляємо запит до interactor для отримання даних якими заповнимо контейнери.
         interactor?.makeRequest(request: .getNewsFeed)
+        //Запит данних про користувача
+        interactor?.makeRequest(request: .getUser)
+    }
+    
+    //Метод в якому будемо настроювати navBar
+    private func setupTopBars() {
+        //Позволяє скривати наш navBar коли ми гортаємо новини в низ
+        self.navigationController?.hidesBarsOnSwipe = true
+        //Скажемо що буде фотка в navBar
+        self.navigationController?.navigationBar.shadowImage = UIImage()
+        //Присвоюємо кастомну view
+        self.navigationItem.titleView = titleView
     }
     
     //Метод приймає готові дані для відображення з моделі даних
@@ -68,6 +83,9 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
             //Заповнюємо модель постів тими поставми які отримуємо тут
             self.feedViewModel = feedViewModel
             table.reloadData()
+        case .displayUser(userViewModel: let userViewModel):
+            //Тут вже сетим фотку
+            titleView.set(userViewModel: userViewModel)
         }
     }
     

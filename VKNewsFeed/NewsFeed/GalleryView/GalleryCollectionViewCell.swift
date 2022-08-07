@@ -37,7 +37,7 @@ class GalleryCollectionViewCell: UICollectionViewCell {
         myImageView.image = nil
     }
     
-    //Методя кий приймає силку для скачування фото
+    //Метод який приймає силку для скачування фото
     func set(imageUrl: String?) {
         myImageView.set(imageURL: imageUrl)
     }
