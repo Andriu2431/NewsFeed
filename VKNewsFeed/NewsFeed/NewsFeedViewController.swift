@@ -23,6 +23,12 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
     private var feedViewModel = FeedViewModel.init(cells: [])
     //Екземпляр TitleView
     private var titleView = TitleView()
+    //Створимо refreshControl - індикатор для оновлення постів
+    private var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(UIRefreshControl().self, action: #selector(refresh), for: .valueChanged)
+        return refreshControl
+    }()
     
     @IBOutlet weak var table: UITableView!
     
@@ -47,16 +53,8 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
         super.viewDidLoad()
         setup()
         setupTopBars()
-        
-        //Рейструємо контейнер через xib файл
-        table.register(UINib(nibName: "NewsFeedCell", bundle: nil), forCellReuseIdentifier: NewsFeedCell.reuseId)
-        //Рейструємо контейнер через код
-        table.register(NewsFeedCodeCell.self, forCellReuseIdentifier: NewsFeedCodeCell.reuseId)
-        
-        title = "News"
-        //Колір view, table
-        table.separatorStyle = .none
-        table.backgroundColor = .clear
+        setupTable()
+    
         view.backgroundColor = #colorLiteral(red: 0.9568627477, green: 0.6588235497, blue: 0.5450980663, alpha: 1)
         
         //Відправляємо запит до interactor для отримання даних якими заповнимо контейнери.
@@ -64,6 +62,26 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
         //Запит данних про користувача
         interactor?.makeRequest(request: .getUser)
     }
+    
+    //Настройка table
+    private func setupTable() {
+        
+        //Зробимо відстань між постом та titleView
+        let topInsert: CGFloat = 8
+        table.contentInset.top = topInsert
+        
+        //Рейструємо контейнер через xib файл
+        table.register(UINib(nibName: "NewsFeedCell", bundle: nil), forCellReuseIdentifier: NewsFeedCell.reuseId)
+        //Рейструємо контейнер через код
+        table.register(NewsFeedCodeCell.self, forCellReuseIdentifier: NewsFeedCodeCell.reuseId)
+        
+        //Колір view, table
+        table.separatorStyle = .none
+        table.backgroundColor = .clear
+        
+        table.addSubview(refreshControl)
+    }
+    
     
     //Метод в якому будемо настроювати navBar
     private func setupTopBars() {
@@ -75,6 +93,11 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
         self.navigationItem.titleView = titleView
     }
     
+    //Будемо оновляти стрічку з постами
+    @objc private func refresh() {
+        interactor?.makeRequest(request: .getNewsFeed)
+    }
+    
     //Метод приймає готові дані для відображення з моделі даних
     func displayData(viewModel: NewsFeed.Model.ViewModel.ViewModelData) {
         
@@ -83,6 +106,8 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
             //Заповнюємо модель постів тими поставми які отримуємо тут
             self.feedViewModel = feedViewModel
             table.reloadData()
+            //Коли стрічка з постами загрузиться то виключимо refreshControl
+            refreshControl.endRefreshing()
         case .displayUser(userViewModel: let userViewModel):
             //Тут вже сетим фотку
             titleView.set(userViewModel: userViewModel)

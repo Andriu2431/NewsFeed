@@ -67,18 +67,37 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
         //Отримуємо розмір тексту поста та розмір фото в пості
         let sizes = cellLayoutCalculator.sizes(postText: feedItem.text, photoAttachments: photoAttachments, isFullSizedPost: isFullSized)
         
+        //Для того щоб текст відображався коректно
+        let postText = feedItem.text?.replacingOccurrences(of: "<br>", with: "\n")
+        
         //Тобто в модель поста передаємо отриманні данні але в простих типах. Тобто ми маємо данні FeedItem але там вони в своїх типах а нам потрібно їх привести до простих типів FeedViewModel.Cell.
         return FeedViewModel.Cell.init(postId: feedItem.postId,
                                        iconUrlString: profile.photo,
                                        name: profile.name,
                                        date: dateTitle,
-                                       text: feedItem.text,
-                                       likes: String(feedItem.likes?.count ?? 0),
-                                       comments: String(feedItem.comments?.count ?? 0),
-                                       shares: String(feedItem.reposts?.count ?? 0),
-                                       views: String(feedItem.views?.count ?? 0),
+                                       text: postText,
+                                       likes: formattedCounter(feedItem.likes?.count),
+                                       comments: formattedCounter(feedItem.comments?.count),
+                                       shares: formattedCounter(feedItem.reposts?.count),
+                                       views: formattedCounter(feedItem.views?.count),
                                        photoAttachments: photoAttachments,
                                        sizes: sizes)
+    }
+    
+    //Метод який буде правельно показувати кількість лайків, репостів...
+    private func formattedCounter(_ counter: Int?) -> String? {
+        guard let counter = counter, counter > 0 else { return nil }
+        var counterString = String(counter)
+        
+        //Обробимо варіанти чисел які прийдуть
+        if 4...6 ~= counterString.count {
+            //Якщо цифер від 4 до 6 то ставимо букву к
+            counterString = String(counterString.dropLast(3)) + "K"
+        } else if counterString.count > 6 {
+            counterString = String(counterString.dropLast(6)) + "M"
+        }
+        
+        return counterString
     }
     
     //Метод який буде шукати інформацію для користувача
