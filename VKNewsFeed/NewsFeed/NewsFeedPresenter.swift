@@ -45,6 +45,8 @@ class NewsFeedPresenter: NewsFeedPresentationLogic {
             //Отримуємо лінку на фото та передаємо її в модель данних
             let userViewModel = UserViewModel.init(photoUrlString: user?.photo100)
             viewController?.displayData(viewModel: .displayUser(userViewModel: userViewModel))
+        case .presentFooterLoader:
+            viewController?.displayData(viewModel: .displayFooterLoader)
         }
     }
     

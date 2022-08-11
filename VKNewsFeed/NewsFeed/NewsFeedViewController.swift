@@ -21,8 +21,12 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
 
     //Створюємо модель постів
     private var feedViewModel = FeedViewModel.init(cells: [])
+    
     //Екземпляр TitleView
     private var titleView = TitleView()
+    //Екземпляр FooterView
+    private lazy var fotterView = FooterView()
+    
     //Створимо refreshControl - індикатор для оновлення постів
     private var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -54,8 +58,6 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
         setup()
         setupTopBars()
         setupTable()
-    
-        view.backgroundColor = #colorLiteral(red: 0.9568627477, green: 0.6588235497, blue: 0.5450980663, alpha: 1)
         
         //Відправляємо запит до interactor для отримання даних якими заповнимо контейнери.
         interactor?.makeRequest(request: .getNewsFeed)
@@ -80,6 +82,8 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
         table.backgroundColor = .clear
         
         table.addSubview(refreshControl)
+        
+        table.tableFooterView = fotterView
     }
     
     
@@ -108,9 +112,23 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
             table.reloadData()
             //Коли стрічка з постами загрузиться то виключимо refreshControl
             refreshControl.endRefreshing()
+            //Текст для лейбла знизу, показує кількість загружених постів
+            fotterView.setTitle("\(feedViewModel.cells.count) Posts")
         case .displayUser(userViewModel: let userViewModel):
             //Тут вже сетим фотку
             titleView.set(userViewModel: userViewModel)
+        case .displayFooterLoader:
+            //Запусаємо анімацію
+            fotterView.showLoader()
+        }
+    }
+    
+    //Метод який буде фіксувати наше розположення на екрані
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        //Коли прогортаєм 90 процентів від постів зробимо запит
+        if scrollView.contentOffset.y > scrollView.contentSize.height / 1.1 {
+            //Викликаємо контейнер який буде догружати пости
+            interactor?.makeRequest(request: .getNextBatch)
         }
     }
     

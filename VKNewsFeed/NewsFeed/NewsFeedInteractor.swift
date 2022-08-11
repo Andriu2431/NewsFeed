@@ -19,42 +19,33 @@ class NewsFeedInteractor: NewsFeedBusinessLogic {
     //Worker
     var service: NewsFeedService?
     
-    //Масив postId тих постів в яких розвертаємо текст - будемо передавати його в presenter
-    private var revealedPostIds = [Int]()
-    //Створимо всластивість в яку передамо пости які прийшли
-    private var feedResponse: FeedResponse?
-    
-    //Передаємо NetworkService через який зробили запит та оримаємо відповідь
-    private var fetcher: DataFetcherProtocol = NetworkDataFetcher(networking: NetworkService())
-    
     func makeRequest(request: NewsFeed.Model.Request.RequestType) {
         if service == nil {
             service = NewsFeedService()
         }
         
-        //Через switch будемо обробляти запит який передали сюди в метод
+        //Будемо обробляти всі кейси
         switch request {
         case .getNewsFeed:
-            //Робимо запит та отримуємо пости
-            fetcher.getFeed { [weak self] feedResponse in
-                self?.feedResponse = feedResponse
-                self?.presentFeed()
-            }
-            
-        case .revealPostIds(postId: let postId):
-            revealedPostIds.append(postId)
-            presentFeed()
+            //Отримуємо дані та передаємо їх presenter
+            service?.getFeed(completion: { [weak self] revealedPostIds, feed in
+                self?.presenter?.presentData(response: .presentNewsFeed(feed: feed, revealedPostIds: revealedPostIds))
+            })
         case .getUser:
-            fetcher.getUser { userResponse in
-                //Тут передаємо лінку в presenter
-                self.presenter?.presentData(response: .presentUserInfo(user: userResponse))
-            }
+            service?.getUser(completion: { [weak self] user in
+                self?.presenter?.presentData(response: .presentUserInfo(user: user))
+            })
+        case .revealPostIds(postId: let postId):
+            service?.revealedPostIds(forPostId: postId, completion: { [weak self] revealedPostIds, feed in
+                self?.presenter?.presentData(response: .presentNewsFeed(feed: feed, revealedPostIds: revealedPostIds))
+            })
+        case .getNextBatch:
+            //Будемо викликати кейс який буде зарпускати анімацію загрузки
+            self.presenter?.presentData(response: .presentFooterLoader)
+            //Тут будемо догружати пости 
+            service?.getNextBatch(completion: { [weak self] revealedPostIds, feed in
+                self?.presenter?.presentData(response: .presentNewsFeed(feed: feed, revealedPostIds: revealedPostIds))
+            })
         }
-    }
-    
-    private func presentFeed() {
-        guard let feedResponse = feedResponse else { return }
-        //Передаємо пости в presenter
-        presenter?.presentData(response: .presentNewsFeed(feed: feedResponse, revealedPostIds: revealedPostIds))
     }
 }

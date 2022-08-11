@@ -16,8 +16,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="aZU-Wi-zK9">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ibb-Fa-VAD" customClass="GradientView" customModule="VKNewsFeed" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="startCollor">
+                                        <color key="value" red="1" green="0.55294117647058827" blue="0.55294117647058827" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="endCollor">
+                                        <color key="value" red="1" green="0.81568627450980391" blue="0.55294117647058827" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="aZU-Wi-zK9">
+                                <rect key="frame" x="0.0" y="44" width="414" height="852"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <connections>
                                     <outlet property="dataSource" destination="Y6W-OH-hqX" id="afu-V9-D2t"/>
@@ -26,11 +37,15 @@
                             </tableView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
-                        <color key="backgroundColor" systemColor="systemOrangeColor"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="aZU-Wi-zK9" secondAttribute="bottom" id="3Ti-49-FRV"/>
-                            <constraint firstItem="aZU-Wi-zK9" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="hYe-V5-gGH"/>
+                            <constraint firstItem="Ibb-Fa-VAD" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="T5B-oI-OSe"/>
+                            <constraint firstItem="Ibb-Fa-VAD" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="Wlq-yz-kuV"/>
+                            <constraint firstItem="Ibb-Fa-VAD" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="bXR-ah-EfL"/>
+                            <constraint firstItem="aZU-Wi-zK9" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" constant="44" id="hYe-V5-gGH"/>
                             <constraint firstItem="aZU-Wi-zK9" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="omD-BV-nxY"/>
+                            <constraint firstAttribute="bottom" secondItem="Ibb-Fa-VAD" secondAttribute="bottom" id="vfn-T9-i34"/>
                             <constraint firstItem="aZU-Wi-zK9" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="ypd-Js-5cZ"/>
                         </constraints>
                     </view>
@@ -46,9 +61,6 @@
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -9,7 +9,7 @@ import Foundation
 
 //Протокол який буде перетворювати отримані JSON дані в формат який нам потрібен
 protocol DataFetcherProtocol {
-    func getFeed(response: @escaping (FeedResponse?) -> Void)
+    func getFeed(nextBatchFrom: String?, response: @escaping (FeedResponse?) -> Void)
     func getUser(response: @escaping (UserResponse?) -> Void)
 }
 
@@ -26,8 +26,9 @@ struct NetworkDataFetcher: DataFetcherProtocol {
     }
     
     //Отримуємо дані в потрібному форматі - тобто отримуємо уже пости
-    func getFeed(response: @escaping (FeedResponse?) -> Void) {
-        let params = ["filters": "post,photo"]
+    func getFeed(nextBatchFrom: String?, response: @escaping (FeedResponse?) -> Void) {
+        var params = ["filters": "post,photo"]
+        params["start_from"] = nextBatchFrom
         
         //Робимо запит
         networking.request(path: API.newsFeed, params: params) { data, error in
