@@ -58,8 +58,6 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
         setup()
         setupTopBars()
         setupTable()
-    
-        view.backgroundColor = #colorLiteral(red: 0.9568627477, green: 0.6588235497, blue: 0.5450980663, alpha: 1)
         
         //Відправляємо запит до interactor для отримання даних якими заповнимо контейнери.
         interactor?.makeRequest(request: .getNewsFeed)
