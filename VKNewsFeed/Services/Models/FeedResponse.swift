@@ -21,6 +21,8 @@ struct FeedResponse: Decodable {
     var profiles: [Profile]
     //Масив груп
     var groups: [Group]
+    //Потрібно передати в метод який буде загружати додаткові пости
+    var nextFrom: String?
 }
 
 //Інформація в пості

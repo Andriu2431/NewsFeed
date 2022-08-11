@@ -114,6 +114,15 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
         }
     }
     
+    //Метод який буде фіксувати наше розположення на екрані
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        //Коли прогортаєм 90 процентів від постів зробимо запит
+        if scrollView.contentOffset.y > scrollView.contentSize.height / 1.1 {
+            //Викликаємо контейнер який буде догружати пости
+            interactor?.makeRequest(request: .getNextBatch)
+        }
+    }
+    
     //MARK: NewsFeedCodeCellDelegate
     
     func revealPost(for cell: NewsFeedCodeCell) {
