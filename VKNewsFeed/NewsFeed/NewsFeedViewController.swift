@@ -21,8 +21,12 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
 
     //Створюємо модель постів
     private var feedViewModel = FeedViewModel.init(cells: [])
+    
     //Екземпляр TitleView
     private var titleView = TitleView()
+    //Екземпляр FooterView
+    private lazy var fotterView = FooterView()
+    
     //Створимо refreshControl - індикатор для оновлення постів
     private var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -80,6 +84,8 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
         table.backgroundColor = .clear
         
         table.addSubview(refreshControl)
+        
+        table.tableFooterView = fotterView
     }
     
     
@@ -108,9 +114,14 @@ class NewsFeedViewController: UIViewController, NewsFeedDisplayLogic, NewsFeedCo
             table.reloadData()
             //Коли стрічка з постами загрузиться то виключимо refreshControl
             refreshControl.endRefreshing()
+            //Текст для лейбла знизу, показує кількість загружених постів
+            fotterView.setTitle("\(feedViewModel.cells.count) Posts")
         case .displayUser(userViewModel: let userViewModel):
             //Тут вже сетим фотку
             titleView.set(userViewModel: userViewModel)
+        case .displayFooterLoader:
+            //Запусаємо анімацію
+            fotterView.showLoader()
         }
     }
     

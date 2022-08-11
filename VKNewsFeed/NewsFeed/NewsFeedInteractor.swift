@@ -40,6 +40,8 @@ class NewsFeedInteractor: NewsFeedBusinessLogic {
                 self?.presenter?.presentData(response: .presentNewsFeed(feed: feed, revealedPostIds: revealedPostIds))
             })
         case .getNextBatch:
+            //Будемо викликати кейс який буде зарпускати анімацію загрузки
+            self.presenter?.presentData(response: .presentFooterLoader)
             //Тут будемо догружати пости 
             service?.getNextBatch(completion: { [weak self] revealedPostIds, feed in
                 self?.presenter?.presentData(response: .presentNewsFeed(feed: feed, revealedPostIds: revealedPostIds))
